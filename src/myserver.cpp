@@ -17,20 +17,16 @@
 #include "../src/parse.h"
 #include "../src/myhttpd.h"
 
-
-
 using namespace std;
 
 // Set Default values
 RunServer::RunServer()
 {
-		memset(&inValue, 0, sizeof(inValue));
-		inValue.ai_family = AF_UNSPEC;
-		inValue.ai_socktype = SOCK_STREAM;
-		inValue.ai_flags = AI_PASSIVE;
-		 yes=1;
-
-
+	memset(&inValue, 0, sizeof(inValue));
+	inValue.ai_family = AF_UNSPEC;
+	inValue.ai_socktype = SOCK_STREAM;
+	inValue.ai_flags = AI_PASSIVE;
+	yes=1;
 }
 
 // Return Port Number
@@ -60,19 +56,23 @@ void RunServer::accept_connection()
 	if (getaddrinfo(NULL, port.c_str(), &inValue, &serverInfo) != 0)
 		    perror("Get Address:");
 
-	for(validInfo = serverInfo; validInfo != NULL; validInfo = validInfo->ai_next)
-	{
+	for(validInfo = serverInfo; validInfo != NULL; validInfo = validInfo->ai_next) {
 		if((sockId = (socket(validInfo->ai_family, validInfo->ai_socktype,0))) == -1)
 				perror("Socket:");
+		
 		addrlen = sizeof(serverInfo);
-		if (setsockopt(sockId, SOL_SOCKET, SO_REUSEADDR, &yes,sizeof(int)) == -1)
-			{   perror("setsockopt");
-		        break;
-		     }
+		
+		if (setsockopt(sockId, SOL_SOCKET, SO_REUSEADDR, &yes,sizeof(int)) == -1){
+			perror("setsockopt");
+		    break;
+		}
+		
 		if(bind(sockId,validInfo->ai_addr, validInfo->ai_addrlen) == -1)
 				perror("Bind:");
+		
 		break;
-	}				
+	}
+
 	// successfully done with bind
 	
 	struct sockaddr_in *ipv4 = (struct sockaddr_in *)validInfo->ai_addr;
@@ -83,19 +83,21 @@ void RunServer::accept_connection()
 	if(listen(sockId, MAXCONNECTION) == -1)
 		perror("Listen:");
 
-	while(true)		// Main thread will listen continously
-		{
-
+	while(true) {		// Main thread will listen continously 
 		address = sizeof(clientAddr);
+		
 		if((acceptId = accept(sockId,(struct sockaddr*)&clientAddr,(socklen_t *)&address)) == -1)
 				perror("Accept:");
+		
 		inet_ntop(clientAddr.ss_family,get_ip_address((struct sockaddr *)&clientAddr),ip1, sizeof(ip1));
 		u_int16_t clientport = get_port_number((struct sockaddr *)&(validInfo));
 		time_t tim=time(NULL);
 		tm *now=gmtime(&tim);
 		char currtime[50];
+		
 		if (strftime(currtime, 50,"%x:%X", now) == 0)
 				perror("Date Error");
+		
 		string requesttime(currtime);
 		clientIdentity cid;
 		cid.acceptId = acceptId;
@@ -104,8 +106,5 @@ void RunServer::accept_connection()
 		cid.portno = clientport;
 		cid.requesttime = requesttime;
 		P->parseRequest(cid);
-
 	}
-
 }
-
