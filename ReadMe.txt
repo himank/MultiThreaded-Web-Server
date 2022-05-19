@@ -1,24 +1,21 @@
-Multithreaded Web Server: It is a web server implemented in  C++ on a UNIX--?based platform so that it can server multiple incoming client requests.
+Multithreaded Web Server: It is a web server implemented in  C++ on a UNIX based platform so that it can serve multiple incoming client requests.
 
 Overview:
-The  server reads a request (GET or HEAD) from the client and serves the content from the current directory. By default the server is handling multiple requests
-i.e. queuing thread reads requests from the given port and places the requests in ready
-queue. Scheduling thread reads the request from the ready queue and based on the scheduling policy issues the request to one of the available worker threads. The worker
-thread then serves the response back to the client and closes the connection. 
+The  server reads a request (GET or HEAD) from the client and serves the content from the current directory. By default the server is handling multiple requests i.e. queuing thread reads requests from the given port and places the requests in ready queue. Scheduling thread reads the request from the ready queue and based on the scheduling policy issues the request to one of the available worker threads. The worker thread then serves the response back to the client and closes the connection. 
 
 If debug mode is set through the command line then the server will handle only one request at a time.
 
-Moreover, in case of Head request file size should be taken zero and only file metadata information should be returned. In case of Get request whole file content should be displaced.
+Moreover, in case of Head request only file metadata information should be returned. In case of Get request whole file content is returned.
 
-if the request is for a particular file and that file does not exist then the listing of directory is displaced based on alphabetic order.
+If the request is for a particular file and that file does not exist then the listing of directory is displaced based on alphabetic order.
 
 Logging of request is done in a file.
 
-Two scheduling policies are used to serve the client request:
-1. First come first cout.
-2. Shortest Job FIrst.
+Two scheduling policies are used to serve the requests:
+1. First come first served.
+2. Shortest Job First.
 
-A threadpool of initial size (10) is set up at the starting + one scheduler thread is used + main thread.
+A total of 12 threads are running. A threadpool of initial size (10) + one scheduler thread + main thread.
 
 By default file directory is set to : "/home/himank/workspace/TeamG14/files" which should be changed based on where the files are present.
 
